@@ -235,3 +235,216 @@ Taken together, these papers support a research agenda—adaptive codecs, constr
 - [3GPP TS 22.173 specification record](https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=620)
 - [3GPP TS 23.228 specification record](https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=821)
 - [3GPP: Release 21 timeline](https://www.3gpp.org/news-events/3gpp-news/rel21-timeline)
+
+## IMS Voice Services in 6G: Source Summary for Simulation
+
+This section extracts the IMS voice-service concepts, architectures, and flows from the repository paper [*Evolution of IMS Voice Services in 6G Networks*](./5304-Final-20251211-154657.pdf) (Amit Jain and Vaibhav Birla, IJECS, Vol. 14, Issue 11, November 2025, DOI: [10.18535/ijecs/v14i11.5304](https://doi.org/10.18535/ijecs/v14i11.5304)). It reorganizes the paper into components and behaviors that can be represented in a discrete-event or network simulation.
+
+**Status and interpretation:** The paper describes proposed 6G/AI-enhanced behaviors, not an adopted 3GPP 6G IMS specification. Its reference architecture diagram is a high-level network-slicing/AI schematic (paper p. 27852); other flows below are reconstructed from the paper's prose and call-flow descriptions, not reproduced as standardized procedures. The reported testbed metrics are paper claims, not independently validated simulation targets. Names such as P-CSCF, S-CSCF, TAS, HSS, and SIP/SDP are established IMS concepts; future 6G interfaces, QoS identifiers, AI decisions, and slice procedures remain design choices.
+
+### Service and network functions
+
+| Component / concept | Simulation responsibility | Information or action described in the paper |
+|---|---|---|
+| UE / IMS client | Generate calls, register, offer media, consume policy outcomes, and report endpoint/media state. | SIP INVITE with SDP; voice/video capability; optional location and device context. |
+| 6G SA RAN and AMF | Model access, mobility, radio-condition telemetry, and access-side resource constraints. | RSRP, CQI, uplink congestion, location, and handover/access changes inform session decisions. The paper describes AMF as the path for RAN analytics. |
+| SMF / UPF and packet transport | Establish IP connectivity and carry RTP/SRTP media; model path delay, jitter, loss, and congestion. | The paper describes dedicated QoS treatment and possible alternate paths; it does not define a normative 6G media path. |
+| P-CSCF | First IMS signaling hop; apply signaling security/policy and inspect priority indication. | Receives SIP requests and may process/forward a WPS Resource-Priority header. |
+| S-CSCF and HSS | Maintain IMS registration/service context and provide subscriber entitlements to call logic. | User type, WPS eligibility, media capability/preferences, and service profile. |
+| TAS / application server | Apply telephony features and call-routing/service logic. | Call forwarding, ringback, conferencing, enterprise policy, WPS prefix handling, AI decision invocation, and service selection. |
+| AI inference / policy engine | Optional decision module invoked during setup or overload. | Predict call success/error/congestion; recommend route, TADS invocation, codec/media adaptation, priority, or service treatment. Candidate models named include XGBoost, Random Cut Forest (RCF), and LSTM. |
+| PCF (5G-style) / PCRF (legacy EPC-style) | Authorize and coordinate policy/QoS treatment with packet and access functions. | The paper mentions PCF/PCRF and Rx/Gx policy interactions. Treat these as architecture-dependent, not interchangeable 6G interfaces. |
+| I-CSCF / E-CSCF / PSAP | Represent inter-operator routing and emergency call routing. | E-CSCF selects a PSAP using caller location (e.g., GPS, cell, or civic location). |
+| TADS / access selection | Select or evaluate terminating access options where supported by the model. | Candidate paths include VoNR, Wi-Fi calling, or fallback; AI may skip TADS when confidence is high or invoke it when risk is elevated. |
+| SBC / media and QoE monitoring | Optional signaling/media boundary and observation point. | The paper suggests AI invocation at TAS, S-CSCF, edge, device, or SBC, and mid-call QoE monitoring. |
+
+### Reconstructed high-level architecture
+
+The paper's figure groups service classes (public safety, consumer, enterprise) through an IMS core, with AI decision agents and a sustained-performance feedback/modeling loop. The following expands that idea with the IMS, 6G SA, and media functions described elsewhere in the paper.
+
+```mermaid
+flowchart LR
+    UEA[Caller UE / IMS client] --> RAN[6G SA RAN]
+    RAN --> CORE[6G Core: AMF / SMF / UPF]
+    CORE --> PCSCF[P-CSCF]
+    PCSCF --> SCSCF[S-CSCF]
+    SCSCF <--> HSS[HSS: profile and entitlements]
+    SCSCF --> TAS[TAS / telephony services]
+    TAS <--> AI[AI inference and policy]
+    AI <--> DATA[Call history, KPIs, RAN and congestion telemetry]
+    TAS <--> POLICY[PCF / policy control]
+    POLICY --> CORE
+    TAS --> ROUTE{Route and service decision}
+    ROUTE --> TADS[TADS / access selection]
+    ROUTE --> TERM[Terminating IMS / UE-B]
+    ROUTE --> ECSCF[E-CSCF]
+    ECSCF --> PSAP[Emergency PSAP]
+    UEA -. SIP signaling .-> PCSCF
+    TERM -. SIP signaling .-> UEA
+    UEA <-->|RTP / SRTP media over user plane| TERM
+    DATA --> TRAIN[Offline / continuous model update]
+    TRAIN --> AI
+```
+
+In the paper's proposed service model, slice or subscriber class (public safety, enterprise, consumer) influences policy and resource treatment. The IMS/TAS owns telephony and session decisions; the packet core and RAN deliver the authorized connectivity and QoS. A simulation may model the AI and slice as policy inputs rather than assuming either is a standardized 6G function.
+
+### Baseline IMS voice call flow
+
+This flow captures the paper's conventional SIP/SDP baseline and adds response messages to make a runnable call model. It is an illustrative IMS call, not a 6G-specific signaling specification.
+
+```mermaid
+sequenceDiagram
+    participant A as Caller UE-A
+    participant R as 6G SA RAN / Core
+    participant P as P-CSCF
+    participant S as S-CSCF
+    participant H as HSS
+    participant T as TAS
+    participant B as Terminating IMS / UE-B
+    participant U as UPF / media path
+    A->>R: Access, IP session, and IMS registration
+    A->>P: SIP INVITE + SDP offer
+    P->>S: Validate/forward SIP; inspect applicable priority policy
+    S->>H: Retrieve subscriber profile / service data
+    H-->>S: Entitlements, media preferences, service triggers
+    S->>T: Invoke TAS using service criteria
+    T->>B: Route INVITE; apply terminating service logic
+    B-->>T: 180 Ringing (if applicable)
+    T-->>A: 180 Ringing
+    B-->>T: 200 OK + SDP answer
+    T-->>A: 200 OK + negotiated media
+    A->>B: ACK
+    A<<->>B: RTP/SRTP voice media via user plane
+    A->>B: BYE
+    B-->>A: 200 OK
+    Note over R,U: Core/RAN policy and resources support media transport; IMS controls the SIP session.
+```
+
+**Media and QoS parameters mentioned in the paper:** SDP negotiates media and codec; SRTP is cited for media encryption. The paper cites QCI 1 / 5QI 1 for conversational voice, DSCP 46 for standard voice and DSCP 47 for priority traffic. These are source examples from existing-generation contexts and must not be assumed to be 6G-defined values or universally configured. For simulation, make the QoS mapping, admission policy, and encryption overhead explicit configurable parameters.
+
+### AI-assisted enterprise call flow
+
+The case study (paper pp. 27849–27850) describes an enterprise caller with WPS disabled, video capability enabled, and degraded radio/uplink conditions. AI/TAS/PCF policy downgrades video to audio, may bypass TADS, selects a low-rate codec, activates QoE monitoring, and can establish a standby SIP path.
+
+```mermaid
+sequenceDiagram
+    participant UE as Enterprise UE
+    participant RAN as RAN / AMF telemetry
+    participant IMS as P-CSCF / S-CSCF / HSS
+    participant TAS as AI-enabled TAS
+    participant AI as AI policy inference
+    participant PCF as PCF / QoS policy
+    participant TADS as TADS / access selection
+    participant PEER as Terminating UE
+    UE->>IMS: INVITE + audio/video SDP
+    IMS->>IMS: Retrieve profile: enterprise=true, WPS=false, video=true
+    RAN-->>AI: RSRP, CQI, uplink congestion, mobility context
+    IMS->>TAS: Invoke enterprise telephony policy
+    TAS->>AI: Evaluate profile, radio state, history, and service intent
+    AI-->>TAS: Route, media, TADS, and redundancy recommendations
+    alt High confidence in primary access
+        TAS->>TADS: Skip TADS (only if policy permits)
+    else Degraded or uncertain access
+        TAS->>TADS: Evaluate alternate access / fallback candidates
+        TADS-->>TAS: Selected access and route
+    end
+    TAS->>PCF: Request authorized voice QoS treatment
+    PCF-->>TAS: Policy decision / resource outcome
+    TAS->>PEER: INVITE with adapted audio-only SDP, if negotiated
+    PEER-->>UE: SIP provisional and final responses
+    UE<<->>PEER: Voice media; QoE monitoring and possible handover alert
+    TAS-->>AI: Call outcome, codec effectiveness, setup time, QoE/CDR data
+```
+
+**Inputs:** subscriber/service class, WPS entitlement, device media capability, RSRP/CQI, uplink congestion, location/mobility history, network load, recent SIP errors, and historical call success/QoE. **Outputs:** service invocation, access/route choice, TADS invoke/skip, codec/media profile, QoS request, priority treatment, redundancy activation, and monitoring policy. For safe modeling, constrain decisions by entitlement, endpoint codec compatibility, operator policy, and available resources; AI should recommend within those rules, not bypass authorization.
+
+### Emergency and Wireless Priority Service (WPS) flows
+
+The paper distinguishes emergency routing (911 to PSAP using location via E-CSCF) from WPS priority handling (e.g., *272 prefix and an RPH namespace such as `wps.0`). It also discusses a future combined priority/emergency scenario. Emergency treatment should remain distinct from subscriber WPS entitlement in a model.
+
+```mermaid
+sequenceDiagram
+    participant UE as Caller UE
+    participant P as P-CSCF
+    participant S as S-CSCF / TAS
+    participant AI as AI / policy engine
+    participant PCF as Policy control / core
+    participant E as E-CSCF
+    participant PSAP as Selected PSAP
+    participant RAN as RAN / alternate access
+    UE->>P: Emergency INVITE (location/context if available)
+    P->>S: Validate signaling and applicable priority indicators
+    S->>E: Route emergency session
+    E->>E: Map location to responsible PSAP
+    E->>AI: Request context-aware route/resource decision (proposed)
+    AI->>PCF: Request priority resources / suitable slice or path (proposed)
+    PCF->>RAN: Apply authorized resource policy
+    alt WPS entitlement and valid priority indication
+        P->>S: Preserve/validate RPH (e.g., wps.0)
+        S->>AI: Include WPS class / SPL in decision inputs
+    else No WPS entitlement
+        S->>AI: Apply emergency policy without WPS entitlement
+    end
+    opt Congestion or access failure
+        AI->>RAN: Select permitted alternate access (e.g., Wi-Fi / NTN) if available
+    end
+    E->>PSAP: Deliver emergency call and available location
+    PSAP-->>UE: Answer / emergency media session
+```
+
+The paper's proposed AI inputs for emergency/WPS decisions include caller location, PSAP proximity/availability, congestion forecasts, WPS/service subscription attributes, agency affiliation, and historical call outcomes. Proposed actions include priority queue/resource allocation, alternate access or slice selection, and localized service logic. These are research concepts; do not model inferred voice keywords or sentiment as authoritative emergency detection unless explicitly treated as a separate, consented experimental feature.
+
+### AI learning and overload-control loop
+
+The paper proposes a feedback loop in which call/session telemetry feeds prediction and tuning. It mentions XGBoost for SIP error likelihood, RCF for anomaly/congestion detection, and LSTM for time-series overload/drop forecasting. A model should output a bounded recommendation consumed by deterministic policy and capacity checks.
+
+```mermaid
+flowchart LR
+    CALL[IMS call events and CDRs] --> FEATURES[Feature aggregation]
+    RAN[Radio, mobility, and congestion telemetry] --> FEATURES
+    FEATURES --> MODELS[XGBoost / RCF / LSTM or baseline policy]
+    MODELS --> DECISION[Route, codec, TADS, QoS, overload recommendation]
+    DECISION --> GUARD[Entitlement, policy, capacity, and compatibility checks]
+    GUARD --> CONTROL[TAS / PCF / core actions]
+    CONTROL --> OUTCOME[Call setup, errors, QoE, drops, resource use]
+    OUTCOME --> CALL
+    OUTCOME --> EVAL[Offline evaluation and retraining]
+    EVAL --> MODELS
+```
+
+Potential overload responses named in the paper include rerouting away from congested TAS nodes, skipping nonessential application processing, using pre-cached service templates for emergency/WPS, selecting alternate access, and reserving resources for authorized priority users. A simulator should model the trade-offs (e.g., lower feature completeness versus shorter setup time) and ensure its fallback path does not depend on AI availability.
+
+### Simulation scenario and measurement checklist
+
+| Scenario | Initial conditions | Policy decisions to model | Outcomes to record |
+|---|---|---|---|
+| Baseline voice | Registered subscribers, stable access, compatible voice codec. | Standard SIP routing and media negotiation. | Setup success/time, SIP message count, one-way delay, jitter, loss, QoE, resource use. |
+| Enterprise under weak coverage | Enterprise entitlement; WPS false; video-capable UE; low RSRP/CQI or uplink congestion. | Audio-only adaptation; codec selection; conditional TADS skip; optional standby route. | Setup time/success, codec, jitter/loss, interruption, route selected, policy compliance. |
+| WPS under congestion | WPS-eligible subscriber and valid priority indication; congested node/slice. | Validate priority namespace/SPL; admission and priority resources; permitted alternate access. | Completion probability by class, queueing delay, fairness, pre-emption/admission, resource consumption. |
+| Emergency call | Emergency target, location available/unavailable, PSAP choices, variable network load. | E-CSCF/PSAP mapping; emergency resource policy; optional alternate path. | Correct PSAP rate, call completion, setup time, location availability, continuity. |
+| Predictive overload | Rising CPU, signaling load, SIP 480/503, or media QoE degradation. | Alert/re-route, scale or redistribute, reduce optional work; compare AI with threshold baseline. | Forecast precision/recall, errors, setup latency, rejected calls, recovery time, false actions. |
+| Mobility / access transition | Handover, cell-edge, Wi-Fi transition, or NTN delay/loss profile. | Media adaptation, continuity/reselection, fallback behavior. | Interruption duration, dropped calls, delay/jitter/loss, recovery success. |
+
+Recommended independent variables include offered calls and concurrency; subscriber/service class; access type; RSRP/CQI; loss, jitter and delay; TAS/IMS load; SIP error probability; HSS lookup delay; codec set; handover rate; policy/AI inference latency and failure rate; and resource availability. Keep control and treatment runs identical except for the policy being compared; report distributions and confidence intervals rather than a single best-case value.
+
+**Paper-reported figures to treat as hypotheses, not defaults:** The paper states that its case study saw 36% lower mean call setup time with selective TADS; 12% higher call success under high mobility; >94% overload prediction accuracy; >98% call success; 28% fewer SIP 480/503 errors; 95% proactive redistribution; <250 ms setup and <20 ms jitter in its enterprise example; and sub-100 ms WPS setup for SPL 0 (pp. 27849, 27852–27853). The paper does not provide enough reproducible experiment detail in the reported sections to treat these values as independently verified or generally achievable. Reproduce them only as comparison targets with explicit workload, baseline, definitions, and measurement method.
+
+### Additional IMS voice and multimedia services in scope
+
+- **Telephony services:** call forwarding, ringback, conferencing, dialing/service logic, business call-connect policies, and optional recording or compliance services (paper pp. 27845–27846).
+- **Voice and video:** SIP INVITE/SDP negotiation; audio codec selection and adaptation; video codec examples include H.264 and VP8. Video needs separate bandwidth/QoS modeling from voice.
+- **Messaging / RCS:** SIP MESSAGE or session-based MSRP; possible IP-SM-GW interworking to SMS. These are adjacent IMS multimedia services, not part of the voice-media path.
+- **Emergency and public safety:** E-CSCF location-based routing to PSAP; priority handling and potential dedicated policy/resource treatment.
+- **WPS:** prefix/service entitlement and SIP Resource-Priority handling (e.g., `wps.0`); distinguish a valid authorized WPS call from emergency dialed digits alone.
+- **AI assistance:** optional transcription, summarization, sentiment cues, contextual suggestions, translation, and voice-biometric authentication. These are application capabilities with privacy, consent, accuracy, and compute implications, not mandatory IMS call setup functions.
+- **Security and QoS:** SIP signaling protection (paper cites IPsec/TLS), SRTP media, admission control, and policy-authorized differentiated forwarding. A simulation must model signaling and media protection separately if their overhead or failure behavior matters.
+
+### Source map
+
+| Paper pages | Extracted material |
+|---|---|
+| 27844–27845 | IMS evolution context; SIP/SDP baseline; CSCF, TAS, HSS, E-CSCF; media, QoS, security. |
+| 27846–27848 | AI-assisted sessions; emergency services, WPS, context inputs and proposed slicing. |
+| 27849–27850 | HSS/RAN enterprise case study; codec adaptation, TADS, QoE and slice-aware session policy. |
+| 27851–27852 | AI/ML and sustained-performance loop; paper's network-slicing/AI figure and testbed outline. |
+| 27852–27854 | TADS skip, overload control, claimed KPI results, conclusion and future directions. |
