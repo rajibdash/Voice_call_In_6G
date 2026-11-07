@@ -170,6 +170,12 @@ Useful current anchors are **TR 22.870** for 6G use cases and service requiremen
 
 Research is exploring AI-enabled voice coding, efficient voice over constrained NTN links, and more programmable RAN resource control. These are research directions and prototypes—not evidence that 6G will use a semantic-token voice format, put generative models in the UPF, or require an AI-controlled IMS. Results for one codec, channel, or simulation should not be generalized into an end-to-end 6G voice guarantee.
 
+## 6G timeline: from 5G to 6G and beyond
+
+The transition from 5G to 6G is expected to be gradual, with 5G evolution, 6G research, standards work, trials, and eventual deployments overlapping. The timeline below is an industry overview of research, standardization, and deployment milestones—not a guarantee of dates or a specification of 6G voice features. For the current 3GPP milestones, see the [Release 21 timeline](https://www.3gpp.org/news-events/3gpp-news/rel21-timeline); for the broader vision, see the [ITU IMT-2030 framework](https://www.itu.int/rec/R-REC-M.2160/en).
+
+![Illustrative timeline from 5G evolution through 6G research, standardization, trials, and deployment](6g-timeline.svg)
+
 ## 6G Voice: 3GPP Standardization Perspective
 
 *Addendum (7 November 2026). This section supplements the draft above; it does not revise the preceding material.*
