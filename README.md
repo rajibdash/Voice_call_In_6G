@@ -12,6 +12,61 @@ There might be below 2 cases:
 
 **NOTE**: Need to check VoNR and VoLTE user services and call flow, architecture. 
 
+## Additional Thought with AI involvement
+
+Functional Architecture of the AI-MAS, AI Media Application Server (AI-MAS) acts as the real-time computational core for Voice over 6G (Vo6G) calls. 
+It bridges the deterministic, session-controlled environment of the IP Multimedia Subsystem (IMS) with the highly dynamic, predictive world of AI/ML Ops.
+
+```
+
+     [6G User Equipment (UE)] <====== (SIP Signaling / SDP Negotiation) =========> [6G IMS Core (CSCF)]
+                   ||                                                                       ||
+     (RTP Audio / IMS Data Channel)                                                (ISC Interface / SIP)
+                   ||                                                                       ||
+                   \/                                                                       \/
++-------------------------------------------------------------------------------------------------------+
+|  AI-MAS (AI MEDIA APPLICATION SERVER)                                                                 |
+|                                                                                                       |
+|  +-------------------------------------------------------------------------------------------------+  |
+|  | 1. IMS SIGNALING & ORCHESTRATION LAYER                                                          |  |
+|  |    - SIP/SDP Protocol Handler     - Data Channel Gateway (WebRTC/SCTP)                          |  |
+|  |    - Session Anchor State Machine - Dynamic Resource Router                                     |  |
+|  +-------------------------------------------------------------------------------------------------+  |
+|                                                  ||                                                   |
+|                                                  \/                                                   |
+|  +-------------------------------------------------------------------------------------------------+  |
+|  | 2. DISTRIBUTED EXECUTION LAYER (In-Network Compute Sandbox)                                     |  |
+|  |    - Context Analytics Engine     - Task Decomposition & Intent Parser                          |  |
+|  |    - High-Speed Shared Memory     - Tensor Processing Runtime (ONNX / TensorRT / vLLM)          |  |
+|  +-------------------------------------------------------------------------------------------------+  |
+|                                                  ||                                                   |
+|                                                  \/                                                   |
+|  +-------------------------------------------------------------------------------------------------+  |
+|  | 3. MULTI-AGENT MEDIA PROCESSING BLOCKS                                                          |  |
+|  |    - Neural Audio Codec (Adaptive) - Immersive Spatial Audio Engine                             |  |
+|  |    - Real-Time Translation Agent  - Generative Semantic Reconstructor                           |  |
+|  +-------------------------------------------------------------------------------------------------+  |
+|                                                  ||                                                   |
+|                                                  \/                                                   |
+|  +-------------------------------------------------------------------------------------------------+  |
+|  | 4. CONTROL, OBSERVABILITY & TRUST LAYER                                                         |  |
+|  |    - Inference Metrics Broker     - Model Verification Gateway                                  |  |
+|  |    - Privacy & Guardrail Enforcer - Topology Performance Monitor                                |  |
+|  +-------------------------------------------------------------------------------------------------+  |
++-------------------------------------------------------------------------------------------------------+
+                                                   ||
+                            (Model Deployment / Real-Time Telemetry / re-training)
+                                                   ||
+                                                   \/
++-------------------------------------------------------------------------------------------------------+
+|  CENTRALIZED / REGIONAL AI/ML OPS FABRIC                                                              |
+|     - Model Registry  - Drift Detection  - Shadow Deployment Coordinator  - Continuous Training Loops |
++-------------------------------------------------------------------------------------------------------+
+
+```
+_*Will explain in detail further!*_
+
+
 ## Documentation
 
 - [6G voice-call architecture and research notes](docs/architecture/voice-call-in-6g.md)
