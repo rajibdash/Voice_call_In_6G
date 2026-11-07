@@ -262,7 +262,9 @@ Taken together, these papers support a research agenda—adaptive codecs, constr
 
 ### Standards status and comparison
 
-**VoNR** is the established 5G Standalone voice deployment model: IMS provides telephony and SIP session control over 5G NR and the 5G Core. In contrast, IMT-2030 (6G) has a framework and research/study work, but no standardized end-to-end 6G voice call procedure or 6G voice QoS profile. The 6G column below is therefore a **simulation proposal**, not a description of a ratified 6G system. The ITU's IMT-2030 framework includes an *Artificial Intelligence and Communication* usage scenario; it does not prescribe a named “AI Domain” network function in the 6G Core.
+**VoNR** is the established 5G SA Voice deployment model: IMS provides telephony and SIP session control over 5G NR and the 5G Core Network. In contrast, IMT-2030 (6G) has a framework and research/study work, but no standardized end-to-end **6G voice call** procedure or 6G voice QoS profile. The 6G column below is therefore a **simulation proposal**, not a description of a ratified 6G system. The ITU's IMT-2030 framework includes an *Artificial Intelligence and Communication* usage scenario; it does not prescribe a named “AI Domain” network function in the 6G Core.
+
+VoNR: a call solution based on 5G access, enabling both voice services and data services to be carried by the 5G network.
 
 | Aspect | 5G VoNR reference | Candidate 6G voice model |
 |---|---|---|
