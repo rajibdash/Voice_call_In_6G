@@ -49,8 +49,9 @@ This repository collects research and a conceptual design for voice services ove
 
 ## 0. Draft initial layout
 
+This is currently a documentation-focused project; no source-code or test directories are needed yet. Will do some simulation code shortly.!
+
 ```
-This is currently a documentation-focused project; no source-code or test directories are needed yet.
 +-------------------------------------------------------------+
 |              IMS / Next-Gen Communication Engine            |  <-- Session Control, Data Channels, AI Services
 +-------------------------------------------------------------+
