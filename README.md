@@ -639,6 +639,25 @@ Key ideas in the proposal include:
 
 The proposal is evolutionary in the sense that AI capabilities complement communication services and network functions. It does not specify the final 6G core decomposition, standardized interfaces, model placement, or deployment timeline for any individual AI capability.
 
+![Proposed 6G core AI-domain interaction with UE intent and AI agents, network handlers, and an application function](6g-cn-ai-domain-fig-2-intent-and-ai-agent-interaction.jpeg)
+
+*Figure: Proposed 6G core AI-domain and agent interaction. The figure is a conceptual proposal, not a standardized 6G voice architecture.*
+
+### Applying the proposed figure to voice over 6G
+
+For voice, this figure adds an optional AI-and-intent interaction alongside the communication service; it does not replace the voice call path. The voice-specific interpretation is:
+
+| Figure element | Voice-over-6G interpretation |
+|---|---|
+| UE intent client | May request an experience such as continuity or low conversational delay. The request is advisory and does not replace IMS registration, SIP call setup, or negotiated media. |
+| UE AI agent and AF | May request or provide optional capabilities such as translation or assistance. Such services require supported endpoints, authorization, and applicable consent; they are not required to place a call. |
+| 6G CN PS domain | Carries IMS signaling and the negotiated voice media between endpoints over the access and core user plane. RTP/SRTP remains the baseline media model in this proposal. |
+| AI-domain agent handler and network handler | May interpret an authorized request and coordinate an optional recommendation for connectivity, policy, or compute. They do not own call state or directly guarantee radio resources. |
+
+A voice-oriented revision of the drawing would show IMS as the call-control service, with SIP signaling between the UE and IMS; a separate RTP/SRTP media path between the callers through the PS domain; and an operator-policy/authorization gate between AI recommendations and any network action. Keep intent and AI-service interactions as optional, distinct arrows, rather than routing ordinary voice media through the AI domain. If AI assistance is unavailable, unauthorized, or cannot be provisioned, the call falls back to the configured IMS service and operator policy.
+
+These are proposed modeling changes to the generic figure, not standardized 6G interfaces or procedures. The AI domain remains optional and cross-cutting; IMS and the communication network retain their respective service-control and connectivity responsibilities.
+
 ### Conceptual architecture, including IMS
 
 The diagram distinguishes the proposed AI domain from IMS service control and the connectivity functions that carry signaling and media. Dotted arrows are conceptual interactions only; they do not represent standardized interfaces.
