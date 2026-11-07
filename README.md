@@ -1,16 +1,28 @@
-# Voice call In 6G (__*Work in progress*__)
-6G voice is a design and research topic, not yet a standardized end-to-end system. IMS is the mature 3GPP multimedia-service baseline to consider, but its precise role and evolution in 6G remain subject to Release 21 standardization.
+# Voice Call in 6G
 
-# 6G Standalone (SA) Voice Call: Conceptual Architecture & Design
+This repository collects research and a conceptual design for voice services over future 6G networks. The architecture and signaling flows are proposals, not a 3GPP specification; see the standardization notes in the [architecture document](docs/architecture/voice-call-in-6g.md).
 
-This work-in-progress document explores a possible end-to-end design for voice over a future 6G Standalone (SA) system. The diagrams, protocol labels, and signaling flows below are proposals, not a technical specification; the standards status and design boundaries are clarified in the addendum.
+## Documentation
 
----
+- [6G voice-call architecture and research notes](docs/architecture/voice-call-in-6g.md)
+- [Source paper](docs/references/5304-Final-20251211-154657.pdf)
 
-## 0. Draft initial layout
+## Repository structure
 
+```text
+.
+├── assets/
+│   ├── diagrams/       # Diagrams used by the documentation
+│   └── images/         # Supporting images
+├── docs/
+│   ├── architecture/   # Architecture and research documentation
+│   └── references/     # Source papers and references
+├── .gitignore
+├── LICENSE
+└── README.md
 ```
 
+This is currently a documentation-focused project; no source-code or test directories are needed yet.
 +-------------------------------------------------------------+
 |              IMS / Next-Gen Communication Engine            |  <-- Session Control, Data Channels, AI Services
 +-------------------------------------------------------------+
