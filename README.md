@@ -7,8 +7,9 @@ see the standardization notes in the [architecture document](docs/architecture/v
 ## Initial Thoughts
 There might be below 2 cases: 
 
-* a. A 6G UE will do a call to 5G UE or vice-versa, else will do a voice call to 4G/LTE UE as well.
+* a. A 6G UE will do a voice call to 5G UE or vice-versa, else will do a voice call to 4G/LTE UE as well.
 * b. A 6G UE will do a voice call to 6G UE, which is natural.
+* c. Both Voice call and data traffic will be possible.
 
 **NOTE**: Need to check VoNR and VoLTE user services and call flow, architecture. 
 
