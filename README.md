@@ -236,6 +236,93 @@ Taken together, these papers support a research agenda—adaptive codecs, constr
 - [3GPP TS 23.228 specification record](https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=821)
 - [3GPP: Release 21 timeline](https://www.3gpp.org/news-events/3gpp-news/rel21-timeline)
 
+## 5G VoNR vs. Candidate 6G Voice: Comparison and Simulation Model
+
+### Standards status and comparison
+
+**VoNR** is the established 5G Standalone voice deployment model: IMS provides telephony and SIP session control over 5G NR and the 5G Core. In contrast, IMT-2030 (6G) has a framework and research/study work, but no standardized end-to-end 6G voice call procedure or 6G voice QoS profile. The 6G column below is therefore a **simulation proposal**, not a description of a ratified 6G system. The ITU's IMT-2030 framework includes an *Artificial Intelligence and Communication* usage scenario; it does not prescribe a named “AI Domain” network function in the 6G Core.
+
+| Aspect | 5G VoNR reference | Candidate 6G voice model |
+|---|---|---|
+| Network | 5G SA: NR access and 5G Core provide IP connectivity; IMS provides voice service. | Candidate 6G SA access/core with a separately modeled IMS-compatible service layer. Future 6G functions and interfaces are not yet fixed. |
+| Call control | IMS registration and SIP/SDP call setup, modification, and release. | Reuse SIP/SDP and IMS behavior as the interoperable baseline; treat any replacement or extension as a separately defined research scenario. |
+| Media | Negotiated voice media uses RTP (and secure media such as SRTP where deployed) over the user plane. | Keep the same RTP/SRTP baseline. New codecs, semantic representations, translation, or AI media processing are optional experiments and require compatible endpoints and fallback. |
+| QoS | 3GPP TS 23.501 defines standardized 5QI characteristics, including 5QI 1 for conversational voice and 5QI 5 for IMS signaling. These are QoS profiles, not end-to-end guarantees; actual policy and provisioning depend on deployment. | Make flow classification, resource admission, scheduling, and delay/loss assumptions explicit parameters. Do not label a proposed 6G treatment “5QI” or present any value as a standardized 6G profile. |
+| Intelligence | Network analytics and automation can support operations; they are not required to decide every call or process its audio. | A logical AI capability may provide analytics or bounded policy recommendations. Its placement, interfaces, authority, and lifecycle are research choices, not a standardized core domain. |
+| Evaluation focus | Call setup success/time, conversational media quality, QoS, mobility, and service continuity. | Measure the same baseline KPIs, then quantify any candidate AI or access/core enhancement against it under identical workload and channel conditions. |
+
+### Where to place the AI domain in a 6G-core simulation
+
+Represent the **AI domain as a logical, cross-cutting capability**, not as a required new user-plane or call-control network function. This keeps the design consistent with the IMT-2030 AI-and-communication direction without claiming that a specific 6G-core decomposition has been standardized.
+
+| Simulation function | Inputs and outputs | Boundary and fallback |
+|---|---|---|
+| Telemetry and analytics | Load, queueing, mobility, radio quality, packet delay/loss, and past call outcomes; produces forecasts or anomaly/QoE indicators. | Use only modeled, authorized data. Record missing, stale, and delayed telemetry. |
+| Model inference | Optional recommendation for resource reservation, route/access candidate, or media adaptation. | Charge inference and telemetry delay to setup when on the critical path. The model recommends; deterministic operator policy and capacity/admission checks decide. |
+| Policy and orchestration | Validates recommendations against subscription, emergency/priority entitlement, endpoint capability, resource limits, and operator policy; applies an allowed action. | Reject or constrain invalid recommendations. With AI unavailable or low confidence, use the configured non-AI policy; never make call completion depend on an undocumented model behavior. |
+| Model/data lifecycle | Model version, placement (edge/core), update cadence, monitoring, and data retention/privacy assumptions. | Treat these as experiment inputs. Keep training/update work out of call latency unless the scenario explicitly models it. |
+| Optional AI voice application | Translation, transcription, or assistance at an endpoint/service layer. | Model separately from network-control AI; require consent, compatible endpoints, and a conventional voice fallback. It is not a prerequisite for a voice call. |
+
+### Discrete-event call model
+
+Use the following as a minimal model specification for a SimPy, ns-3, or equivalent implementation. Start with **two registered UEs and one voice session at a time**; add multiple users and mobility once the single-call path is verified. For a fair comparison, use the same arrival process, endpoint capabilities, radio/transport traces, and random seeds for baseline and candidate runs.
+
+```mermaid
+sequenceDiagram
+    participant A as Caller UE
+    participant R as RAN and core user plane
+    participant I as IMS service layer
+    participant P as Core policy/admission
+    participant D as Optional AI domain
+    participant B as Callee UE
+    A->>I: SIP INVITE with SDP offer
+    I->>P: Request authorized media connectivity/QoS
+    opt Candidate AI-assisted policy
+        P->>D: Telemetry and bounded recommendation request
+        D-->>P: Recommendation, confidence, inference delay
+    end
+    P-->>I: Admit/reject and apply permitted treatment
+    I->>B: Route SIP INVITE
+    B-->>I: Provisional response, then 200 OK with SDP
+    I-->>A: 200 OK
+    A->>I: ACK
+    A->>R: RTP/SRTP packets
+    R->>B: Forward media through user plane
+    B->>R: RTP/SRTP packets
+    R->>A: Forward media through user plane
+    A->>I: SIP BYE
+    I-->>B: Release session and resources
+```
+
+The diagram is an **illustrative simulation sequence**, not a 6G protocol flow. The IMS service layer owns SIP call semantics; policy/admission controls whether requested packet treatment is allowed; RAN and the user plane deliver packets. AI may advise policy but does not replace SIP, emergency routing, subscription authorization, or resource admission.
+
+Model each call as these events:
+
+1. **Arrival:** Generate call attempts with a configured arrival distribution (for example, Poisson arrivals at rate `lambda_calls`). Record caller/callee, service class, endpoint capabilities, and the random seed.
+2. **Call setup:** Add sampled IMS signaling, policy, and routing delays. Apply call blocking or setup failure if authentication, destination, policy, or resource admission fails. For the AI candidate, add telemetry/inference delay and pass its recommendation through the same deterministic policy and capacity checks.
+3. **Alert and answer:** Sample alerting/answer delay; mark setup success only when the modeled answer/acceptance event completes. Record a failure cause for every unsuccessful attempt.
+4. **Media:** During the call, generate or sample voice-packet delay, jitter, loss, and codec rate. Model handover, blockage, congestion, or access changes as explicit events. Do not infer end-to-end quality from radio latency alone.
+5. **Release:** End the call after a sampled holding time, release reserved resources, and account for any teardown signaling.
+
+For each completed call, define **call setup time** from the initial INVITE to the accepted answer/ACK point and **one-way mouth-to-ear delay** as the sum of endpoint/codec, radio, transport, core, and receiving-end processing delays. Specify the exact measurement point for both in the simulator. Report call completion rate, setup-delay distribution, one-way delay, jitter, packet loss, handover interruption, resource utilization, AI inference overhead, and invalid/overridden AI recommendations. Include failed calls in success-rate denominators.
+
+| Experiment | Treatment | Purpose |
+|---|---|---|
+| VoNR baseline | IMS/SIP/RTP over a 5G SA reference path; use the TS 23.501 5QI 1 voice and 5QI 5 IMS-signaling profiles only where the modeled 5G configuration uses them. | Validate the simulator against a defined 5G reference; do not treat 5QI budgets as measured end-to-end call performance. |
+| 6G transport-only candidate | Same IMS call flow, but replace access/core delay, capacity, loss, and mobility distributions with explicitly declared candidate assumptions. No AI control. | Separate transport/access effects from AI policy effects. |
+| 6G candidate with AI policy | Same as transport-only candidate, with optional telemetry/inference and bounded policy recommendations enabled. | Compare QoE and setup/resource outcomes with AI off; include inference cost, model errors, stale telemetry, and AI outage. |
+| Stress and fallback | Sweep load, radio degradation, handover, and AI unavailability/confidence while holding other inputs constant. | Check overload behavior, policy safety, fallback continuity, and whether AI adds latency or causes worse outcomes. |
+
+Treat every 6G delay, capacity, reliability, AI-accuracy, and QoS value as a **scenario parameter**, not a published 6G target. Run multiple independent replications, publish parameter distributions and seeds, and report percentiles/confidence intervals alongside means. An AI-enabled result is meaningful only when compared with the same scenario using a non-AI baseline and when policy violations and call failures are counted.
+
+### References
+
+- [ITU-R Recommendation M.2160-0: Framework and overall objectives of IMT-2030](https://www.itu.int/rec/R-REC-M.2160/en)
+- [3GPP TS 23.501: System architecture for the 5G System](https://www.etsi.org/deliver/etsi_ts/123500_123599/123501/18.10.00_60/ts_123501v181000p.pdf) — including standardized 5QI characteristics.
+- [3GPP TS 23.228: IP Multimedia Subsystem (IMS); Stage 2](https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=821)
+- [3GPP SA1: 6G use cases and service requirements](https://www.3gpp.org/technologies/sa1-use-cases-6g)
+- [ETSI Experiential Networked Intelligence (ENI)](https://www.etsi.org/technical-groups/eni/) — work on AI-enabled network management; not evidence of a standardized 6G-core “AI Domain.”
+
 ## IMS Voice Services in 6G: Source Summary for Simulation
 
 This section extracts the IMS voice-service concepts, architectures, and flows from the repository paper [*Evolution of IMS Voice Services in 6G Networks*](./5304-Final-20251211-154657.pdf) (Amit Jain and Vaibhav Birla, IJECS, Vol. 14, Issue 11, November 2025, DOI: [10.18535/ijecs/v14i11.5304](https://doi.org/10.18535/ijecs/v14i11.5304)). It reorganizes the paper into components and behaviors that can be represented in a discrete-event or network simulation.
