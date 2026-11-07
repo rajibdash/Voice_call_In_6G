@@ -174,7 +174,7 @@ Research is exploring AI-enabled voice coding, efficient voice over constrained 
 
 The transition from 5G to 6G is expected to be gradual, with 5G evolution, 6G research, standards work, trials, and eventual deployments overlapping. The timeline below is an industry overview of research, standardization, and deployment milestones—not a guarantee of dates or a specification of 6G voice features. For the current 3GPP milestones, see the [Release 21 timeline](https://www.3gpp.org/news-events/3gpp-news/rel21-timeline); for the broader vision, see the [ITU IMT-2030 framework](https://www.itu.int/rec/R-REC-M.2160/en).
 
-![Illustrative timeline from 5G evolution through 6G research, standardization, trials, and deployment](../../assets/diagrams/6g-timeline.svg)
+![Illustrative 2022–2032 timeline of 5G evolution and 6G research, ITU and 3GPP standardization, technology trials, pre-commercial activity, and anticipated deployment, with WRC-23, WRC-27, WRC-31, IMT-2030, and Release 21 milestones](../../assets/diagrams/6g-timeline.svg)
 
 ## 6G Voice: 3GPP Standardization Perspective
 
