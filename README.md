@@ -7,6 +7,31 @@ This repository collects research and a conceptual design for voice services ove
 - [6G voice-call architecture and research notes](docs/architecture/voice-call-in-6g.md)
 - [Source paper](docs/references/5304-Final-20251211-154657.pdf)
 
+## Contents
+
+- **Architecture and call flow**
+  - [Draft initial layout](#0-draft-initial-layout)
+  - [Architectural blueprint](#1-architectural-blueprint--network-topography)
+  - [AI-assisted Vo6G call attempt](#ai-assisted-vo6g-call-attempt)
+  - [Draft end-to-end signaling sequence](#3-end-to-end-signaling-sequence-vo6g-sa-session-establishment---draft)
+  - [Protocol stack](#2-protocol-stack-design)
+- **Standards and 6G context**
+  - [3GPP standardization framework](#4-3gpp-standardization-framework)
+  - [6G timeline](#6g-timeline-from-5g-to-6g-and-beyond)
+  - [6G voice standardization perspective](#6g-voice-3gpp-standardization-perspective)
+  - [IMS, 6G Core, and SA RAN responsibilities](#ims-6g-core-and-sa-ran-design-responsibilities)
+- **Simulation and research material**
+  - [Research directions](#5-research-directions)
+  - [VoNR comparison and simulation model](#5g-vonr-vs-candidate-6g-voice-comparison-and-simulation-model)
+  - [IMS voice services source summary](#ims-voice-services-in-6g-source-summary-for-simulation)
+    - [Baseline IMS call flow](#baseline-ims-voice-call-flow)
+    - [AI-assisted enterprise call flow](#ai-assisted-enterprise-call-flow)
+    - [Emergency and priority-service flows](#emergency-and-wireless-priority-service-wps-flows)
+  - [Full-paper review](#supplementary-details-from-a-full-paper-review)
+- **AI-domain proposal and IMS interaction**
+  - [Proposed architecture including IMS](#conceptual-architecture-including-ims)
+  - [Illustrative IMS call with optional AI assistance](#illustrative-ims-call-with-optional-ai-domain-assistance)
+
 ## Repository structure
 
 ```text
@@ -41,6 +66,92 @@ This is currently a documentation-focused project; no source-code or test direct
 ## 1. Architectural Blueprint & Network Topography
 
 This is a **conceptual design**, not a 3GPP architecture. It explores how a future 6G system might build on service-based core principles while supporting AI-enabled services and terrestrial/non-terrestrial access. The eventual 6G architecture, interfaces, and voice procedures remain to be standardized.
+
+### AI-assisted Vo6G call attempt
+
+This sequence puts optional AI assistance beside the ordinary IMS call path. The call proceeds through IMS whether the AI request is accepted, unavailable, or omitted; operator policy and available resources govern any network treatment. This is a conceptual illustration, not a standardized 6G procedure.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant A as Caller UE-A
+    participant R as 6G RANs
+    participant C as 6G Communication Core
+    participant I as IMS (P-CSCF / S-CSCF / TAS)
+    participant B as Callee UE-B
+    participant D as Optional AI Domain
+    participant P as Operator Policy
+
+    A->>R: Obtain access and radio connectivity
+    R->>C: Establish session and user-plane connectivity
+    A->>R: IMS registration
+    R->>C: Carry registration signaling
+    C->>I: Register UE-A with IMS
+
+    par Required IMS call setup
+        A->>R: SIP INVITE with SDP
+        R->>C: Carry SIP signaling
+        C->>I: Forward INVITE
+        I->>I: Apply IMS service logic and route call
+        I->>C: Route INVITE towards UE-B
+        C->>R: Deliver SIP signaling
+        R->>B: SIP INVITE with SDP
+        B-->>R: 180 Ringing
+        R-->>C: Forward 180 Ringing
+        C-->>I: Deliver 180 Ringing
+        I-->>C: Return 180 Ringing
+        C-->>R: Carry response signaling
+        R-->>A: Deliver 180 Ringing
+        alt Callee accepts
+            B-->>R: 200 OK with SDP answer
+            R-->>C: Forward 200 OK
+            C-->>I: Deliver 200 OK
+            I-->>C: Return 200 OK and negotiated SDP
+            C-->>R: Carry response signaling
+            R-->>A: Deliver negotiated session parameters
+            A->>R: SIP ACK
+            R->>C: Carry ACK
+            C->>I: Deliver ACK
+            I->>C: Forward ACK to UE-B
+            C->>R: Carry ACK
+            R->>B: SIP ACK
+        else Callee rejects or is unavailable
+            B-->>R: Final rejection or unavailable response
+            R-->>C: Forward final response
+            C-->>I: Deliver final response
+            I-->>C: Return final response
+            C-->>R: Carry response signaling
+            R-->>A: Deliver final response; no media session
+        end
+    and Optional AI assistance (independent of SIP call control)
+        A-->>R: Optional authorized intent or assistance request
+        R-->>C: Carry request over connectivity
+        C-->>D: Optional exposure/API path (conceptual)
+        D->>P: Recommend optional service or network treatment
+        alt Authorized and applicable
+            P->>C: Approve treatment under operator policy
+            C->>R: Apply treatment if resources and radio conditions permit
+        else Rejected, unavailable, or not applicable
+            P-->>D: No treatment; ordinary IMS call remains unaffected
+        end
+    end
+
+    opt Call accepted
+        A->>R: RTP/SRTP media
+        R->>C: Forward uplink media
+        C->>R: Carry media over the user plane
+        R->>B: Deliver media to UE-B
+        B->>R: RTP/SRTP media
+        R->>C: Forward return media
+        C->>R: Carry media over the user plane
+        R->>A: Deliver media to UE-A
+    end
+
+    Note over A,I: IMS owns registration, SIP routing, call state, and media negotiation.
+    Note over D,P: AI may recommend; operator policy and core functions decide whether anything is provisioned.
+    Note over C,D: AI interactions are conceptual; no standardized 6G API or interface is implied.
+    Note over A,B: AI assistance is optional and is not in the ordinary voice-media path.
+```
 
 ### 1.1 Structural Topology Block Diagram
 

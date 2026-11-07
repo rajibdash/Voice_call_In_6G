@@ -123,6 +123,8 @@ The Control Plane simplifies session setup by introducing an explicit **AI-Inten
 
 The following sequence details an end-to-end call establishment between UE-A (initiating agent/human) and UE-B within a Standalone 6G topology.
 
+For a clearer view of the IMS call path alongside optional AI-domain assistance, see the [AI-assisted Vo6G call attempt](../../README.md#ai-assisted-vo6g-call-attempt).
+
 ```
  UE-A (6G)           6G gNB            6G AMF/SMF          IMS/P-CSCF          UE-B (6G)
    |                   |                    |                   |                  |
