@@ -69,7 +69,12 @@ This is a **conceptual design**, not a 3GPP architecture. It explores how a futu
 
 ### AI-assisted Vo6G call attempt
 
-This sequence puts optional AI assistance beside the ordinary IMS call path. The call proceeds through IMS whether the AI request is accepted, unavailable, or omitted; operator policy and available resources govern any network treatment. This is a conceptual illustration, not a standardized 6G procedure.
+This sequence puts optional AI assistance beside the ordinary IMS call path. 
+The call proceeds through IMS whether the AI request is accepted, unavailable, or omitted; 
+operator policy and available resources govern any network treatment. 
+This is a conceptual illustration, not a standardized 6G procedure.</br>
+
+__*Will fix it*__
 
 ```mermaid
 sequenceDiagram
@@ -187,6 +192,7 @@ sequenceDiagram
 |    |  Semantic Transceiver / Neural Codec Core|  Local Autonomous Conversational AI Agent  |    |
 |    +------------------------------------------+--------------------------------------------+    |
 +-------------------------------------------------------------------------------------------------+
+
 ```
 
 ### 1.2 Key Architectural Evolution Highlights
@@ -272,6 +278,8 @@ The following sequence details an end-to-end call establishment between UE-A (in
    |                                        |                   |                  |
    |<======================== 13. NATIVE VOICE SESSION ===========================>|
    |             (Bi-directional Semantic Token / Real-Time Data Channel)          |
+
+
 ```
 
 ### 3.1 Signaling Flow Descriptions
@@ -415,7 +423,12 @@ Represent the **AI domain as a logical, cross-cutting capability**, not as a req
 
 ### Discrete-event call model
 
-Use the following as a minimal model specification for a SimPy, ns-3, or equivalent implementation. Start with **two registered UEs and one voice session at a time**; add multiple users and mobility once the single-call path is verified. For a fair comparison, use the same arrival process, endpoint capabilities, radio/transport traces, and random seeds for baseline and candidate runs.
+Use the following as a minimal model specification for a SimPy, ns-3, or equivalent implementation. 
+Start with **two registered UEs and one voice session at a time**; add multiple users and mobility 
+once the single-call path is verified. For a fair comparison, use the same arrival process, endpoint 
+capabilities, radio/transport traces, and random seeds for baseline and candidate runs.</br>
+
+__*Will fix it*__
 
 ```mermaid
 sequenceDiagram
