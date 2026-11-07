@@ -1,4 +1,4 @@
-# Voice_call_In_6G (Draft - __*Work in progress*__)
+# Voice call In 6G (__*Work in progress*__)
 Voice in 6G is now being studied in standardization activity, with IMS confirmed as the continued foundation.
 
 # 6G Standalone (SA) Voice Call Architecture & Design Specification
