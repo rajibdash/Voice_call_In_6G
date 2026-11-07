@@ -1,10 +1,9 @@
 # Voice call In 6G (__*Work in progress*__)
-Voice in 6G is now being studied in standardization activity, with IMS confirmed as the continued foundation.
+6G voice is a design and research topic, not yet a standardized end-to-end system. IMS is the mature 3GPP multimedia-service baseline to consider, but its precise role and evolution in 6G remain subject to Release 21 standardization.
 
-# 6G Standalone (SA) Voice Call Architecture & Design Specification
+# 6G Standalone (SA) Voice Call: Conceptual Architecture & Design
 
-This document outlines the full end-to-end technical specification, structural design, signaling flows, and 
-standardization pathways for native Voice over 6G (Vo6G) within a 6G Standalone (SA) deployment framework.
+This work-in-progress document explores a possible end-to-end design for voice over a future 6G Standalone (SA) system. The diagrams, protocol labels, and signaling flows below are proposals, not a technical specification; the standards status and design boundaries are clarified in the addendum.
 
 ---
 
@@ -26,8 +25,7 @@ standardization pathways for native Voice over 6G (Vo6G) within a 6G Standalone 
 
 ## 1. Architectural Blueprint & Network Topography
 
-The 6G SA Voice architecture transitions from the rigid network functions of 5G to an **AI-native, Service-Based Architecture (SBA)** 
-featuring hyper-distributed network intelligence, semantic communication layers, and seamless terrestrial/non-terrestrial network (NTN) integration.
+This is a **conceptual design**, not a 3GPP architecture. It explores how a future 6G system might build on service-based core principles while supporting AI-enabled services and terrestrial/non-terrestrial access. The eventual 6G architecture, interfaces, and voice procedures remain to be standardized.
 
 ### 1.1 Structural Topology Block Diagram
 
@@ -150,23 +148,17 @@ The following sequence details an end-to-end call establishment between UE-A (in
 
 ---
 
-## 4. 3GPP Standardization Framework & Specification Tracks
+## 4. 3GPP Standardization Framework
 
-System design for 6G voice services aligns structurally with specifications established by the **3GPP Technical Specification Group (TSG) Service and System Aspects (SA)** and **Radio Access Network (RAN)**.
+The relevant 3GPP work spans service requirements (SA1), system architecture (SA2), multimedia and codecs (CT/SA4), security (SA3), and radio access (RAN). The existence of a related 5G specification or a research proposal does not make it a 6G requirement. Do not treat the earlier draft's labels, latency figures, or protocol extensions as 3GPP-defined 6G features.
 
-### 4.1 Key Spec Target Matrices
-*   **3GPP TR 23.801:** *Study on Architecture Aspects for the 6G System (FS_6G_ARC)*. This defines foundational interfaces ensuring interoperability between external packet agents and the Core SBA framework.
-*   **3GPP TS 22.261:** *Service requirements for the 6G System*. Dictates latency constraints (< 1ms jitter boundaries) and availability profiles for tactile real-time conversational media arrays.
-*   **3GPP TR 26.802:** *Study on Codecs and Media Processing for 6G*. Governs deployment policies regarding the integration of generative AI structural layers inside user-plane pipelines.
+Useful current anchors are **TR 22.870** for 6G use cases and service requirements, **TS 22.173** for the established multimedia telephony service, **TS 23.228** for the established IMS architecture, and the 3GPP **Release 21 timeline** for the 6G normative-work milestones. These references have different scope: TR 22.870 is a study report, while TS 22.173 and TS 23.228 describe existing service and IMS baselines, not a finished 6G voice specification.
 
 ---
 
-## 5. Academic Research & Industry Implementation Insights
+## 5. Research Directions
 
-To ensure production stability, the architectural models map directly to foundational pillars established by active 6G consortia:
-
-1.  **Semantic Communications Breakthroughs:** Based on paradigms popularized by *Zhang et al.* (IEEE Communications Surveys & Tutorials, 2025), which demonstrate up to **93.5% bandwidth overhead mitigation** by using feature token arrays instead of structural PCM/waveform configurations.
-2.  **Agent-to-Agent Mesh Telemetry:** Adapts structural logic from the *Hexa-X-II Project (Deliverable D1.2)* on native AI engine exposure within foundational radio frameworks, enabling real-time context-switching during active voice calls without dropping active data structures.
+Research is exploring AI-enabled voice coding, efficient voice over constrained NTN links, and more programmable RAN resource control. These are research directions and prototypes—not evidence that 6G will use a semantic-token voice format, put generative models in the UPF, or require an AI-controlled IMS. Results for one codec, channel, or simulation should not be generalized into an end-to-end 6G voice guarantee.
 
 ## 6G Voice: 3GPP Standardization Perspective
 
@@ -188,6 +180,54 @@ For voice-call standardization, the questions to track include service requireme
 
 The architecture, signaling flow, and protocol labels in this document are design proposals, not an approved 3GPP 6G specification. In particular, names such as “NAS Intent,” “QoS Flow ID 20” as a standardized voice profile, “semantic/neural codec” SDP extensions, and a “MoE” in the UPF should not be read as 3GPP-defined 6G procedures or interfaces. Treat them as concepts requiring formal specification and interoperability work unless and until the relevant 3GPP specifications define them.
 
+## IMS, 6G Core, and SA RAN: Design Responsibilities
+
+A useful way to design a 6G voice call is to keep **service control**, **packet-session policy**, and **radio delivery** distinct, then define their interfaces and failure handling. IMS is not the radio scheduler, and the 6G Core is not the SIP call server. A service can use IMS over an IP connection delivered by the mobile core and radio access.
+
+| Domain | Role in a voice call | Design boundary |
+|---|---|---|
+| **IMS / service layer** | Authenticates and registers the subscriber for IMS services; routes SIP sessions; applies telephony service logic; negotiates compatible media; and supports supplementary services and interworking with other IMS networks. | Owns call/session semantics, not radio scheduling or user-packet forwarding. Any IMS evolution for 6G, including AI-assisted features, needs defined service behavior, security, and interoperable signaling. |
+| **6G Core** | Provides access and mobility management, establishes and manages the IP session, applies subscription and operator policy, selects user-plane connectivity, and coordinates QoS treatment and service exposure with the access network. It can support charging, lawful/regulatory functions, and continuity according to the eventual system design. | Carries and governs connectivity for IMS and media; it does not replace SIP service control. Exact 6G functions, interfaces, QoS identifiers, and IMS-to-core policy procedures are not yet specified. |
+| **6G SA RAN** | Connects directly to the 6G core (without relying on an LTE anchor), establishes radio bearers, maps authorized QoS treatment to radio resources, schedules uplink/downlink packets, adapts to channel conditions, and handles radio mobility and link recovery. | Delivers packets under radio constraints; it does not decide who to call or provide telephony service logic. “SA” describes the core connection model, not a promise of zero latency or a dedicated voice slice. |
+| **UE and media endpoints** | Run the IMS client, negotiate and encode/decode media, protect media as applicable, and report radio/media conditions through supported mechanisms. | Codec/model capability and energy use are endpoint constraints; both ends need interoperable media options and a fallback path. |
+
+### Illustrative call lifecycle (not a 6G procedure)
+
+1. The UE obtains access and an IP session through the SA network. The core applies subscriber and operator policy; the RAN provides the radio connection.
+2. The UE registers with IMS and sends a SIP session request over IP. IMS performs service routing and negotiates the mutually supported media parameters with the far end.
+3. If the service needs dedicated or differentiated packet treatment, IMS/service policy can request it through the core's policy mechanisms. The core authorizes and provisions the packet treatment, and the RAN maps it to available radio resources. Exact 6G procedures remain to be defined.
+4. Voice media travels between endpoints through the user plane; IMS remains responsible for session control. Mobility, congestion, loss, or a change of access may trigger policy updates, media adaptation, or session continuity behavior.
+5. On release, IMS clears the session and the network releases resources when no longer needed.
+
+SIP signaling and the media path are separate logical functions even when they share IP connectivity. IMS Data Channels, where supported, are an optional rich-communication capability and are not the voice codec or a mandatory voice-media layer. Likewise, a PDU/IP session or a slice is not itself a voice service: the service, policy, QoS handling, and end-to-end media behavior must work together.
+
+### What 6G SA RAN changes for the voice designer
+
+SA removes dependence on an LTE anchor for the access-to-core path; it does **not** make voice intrinsically reliable or remove radio effects. The RAN still faces fading, interference, blockage, handover gaps, uplink power limits, and competition for spectrum. Those effects directly shape conversational quality through packet loss, jitter, delay, and interruption.
+
+For a voice-service design, the key RAN-to-core questions are:
+
+- **QoS mapping and admission:** How does authorized service policy become radio scheduling priority and an appropriate bearer/flow treatment? What happens when radio resources are scarce—admission control, degradation, or pre-emption—and how are those decisions coordinated end to end?
+- **Mobility and continuity:** How are media packets protected through handover, beam changes, cell-edge operation, and terrestrial/NTN transitions? Call continuity must be tested across access changes, not inferred from a fast scheduler.
+- **Coverage and power:** Voice quality and availability at the cell edge, indoors, and on uplink-limited devices matter as much as peak data rate. High-frequency or very wideband radio is not a prerequisite for good voice.
+- **Scheduling and resilience:** Low-latency scheduling can help, but queueing in the UE, RAN, transport, core, and far-end path all contribute. A service target needs an end-to-end budget and measurable recovery behavior, not a single radio latency number.
+- **AI-assisted control:** RAN automation/xApps may help optimize resources against an SLA, but control-loop delay, data quality, policy constraints, stability, explainability, and safe fallback matter. AI should augment—not replace—deterministic service policy and radio safety controls.
+- **NTN:** Satellite access extends reach but has distinct propagation delay, Doppler, and intermittent-link constraints. Codec efficiency and adaptation help with limited capacity; they cannot eliminate propagation delay. Interactive voice must be evaluated separately from delay-tolerant messaging.
+
+### Current research-informed design view (7 November 2026)
+
+The most defensible near-term design is **evolutionary and service-led**: preserve interoperable IMS telephony and media negotiation as the baseline, and let a future 6G access/core improve coverage, continuity, policy coordination, and automation without assuming a new “native 6G voice” protocol. Research is valuable for selecting candidate enhancements, but it does not establish a 3GPP architecture or deployment requirement.
+
+For designers, prioritize conversational quality and operability—mouth-to-ear delay, jitter, loss concealment, intelligibility, call setup success, handover interruption, emergency calling, security, and interoperability—over headline radio throughput or an isolated latency result. AI-enhanced codecs and translation may be optional negotiated features; the endpoints need a conventional interoperable fallback. Any learned model should be assessed for compute and battery cost, privacy, security, robustness to noise and accents, and predictable behavior when inference is unavailable. Semantic representations are especially application-dependent and are not a drop-in replacement for intelligible human speech.
+
+Recent work illustrates distinct, limited research tracks:
+
+- **LANA, “Lightweight AI-driven High-Fidelity Voice Services over 6G Narrowband Non-Terrestrial Networks,”** explores efficient AI-driven voice for narrowband NTN conditions. It is relevant to constrained-link codec research, not proof of a generally adopted mobile-telephony codec or a way to overcome satellite propagation delay. [Research record](https://researchportal.hkust.edu.hk/en/publications/lana-lightweight-ai-driven-high-fidelity-voice-services-over-6g-n/) · [IEEE Xplore](https://ieeexplore.ieee.org/document/11152968)
+- **“RSLAQ: A Robust SLA-driven 6G O-RAN QoS xApp Using Deep Reinforcement Learning”** studies learning-based RAN QoS/resource control. It informs the automation discussion, but an O-RAN QoS experiment is not a voice-call standard or evidence of guaranteed end-to-end voice quality. [arXiv:2504.09187](https://arxiv.org/abs/2504.09187)
+- **“Flexible and High-Performance Radio Access Networks for Upcoming Sixth-Generation (6G) Systems”** surveys/proposes future RAN design directions. It is useful for understanding radio architecture trade-offs, while voice-specific service and interoperability requirements remain separate questions. [arXiv:2509.24417](https://arxiv.org/abs/2509.24417)
+
+Taken together, these papers support a research agenda—adaptive codecs, constrained-link operation, and policy-aware RAN control—not a settled “AI-native voice stack.” The practical architecture should keep the service layer, core policy, RAN execution, and media endpoints independently testable, with explicit fallback and continuity behavior.
+
 ### 3GPP references
 
 - [3GPP: 6G Use Cases and Service Requirements (SA1)](https://www.3gpp.org/technologies/sa1-use-cases-6g)
@@ -195,4 +235,3 @@ The architecture, signaling flow, and protocol labels in this document are desig
 - [3GPP TS 22.173 specification record](https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=620)
 - [3GPP TS 23.228 specification record](https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=821)
 - [3GPP: Release 21 timeline](https://www.3gpp.org/news-events/3gpp-news/rel21-timeline)
-
