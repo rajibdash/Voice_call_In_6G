@@ -167,3 +167,32 @@ To ensure production stability, the architectural models map directly to foundat
 
 1.  **Semantic Communications Breakthroughs:** Based on paradigms popularized by *Zhang et al.* (IEEE Communications Surveys & Tutorials, 2025), which demonstrate up to **93.5% bandwidth overhead mitigation** by using feature token arrays instead of structural PCM/waveform configurations.
 2.  **Agent-to-Agent Mesh Telemetry:** Adapts structural logic from the *Hexa-X-II Project (Deliverable D1.2)* on native AI engine exposure within foundational radio frameworks, enabling real-time context-switching during active voice calls without dropping active data structures.
+
+## 6G Voice: 3GPP Standardization Perspective
+
+*Addendum (7 November 2026). This section supplements the draft above; it does not revise the preceding material.*
+
+### What 3GPP has standardized so far
+
+3GPP's Release 20 6G work includes SA1's study of use cases and service requirements, documented in [TR 22.870, *Study on 6G Use Cases and Service Requirements*](https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=4374). A TR is a study report: it records study results and is not, by itself, a normative specification of an implementable 6G voice system. As of this addendum, 3GPP has not published a normative specification defining a distinct 6G voice-call architecture, call procedures, or 6G-specific voice protocol stack.
+
+The established 3GPP reference for IP multimedia telephony is IMS: [TS 22.173](https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=620) specifies multimedia telephony service requirements, and [TS 23.228](https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=821) specifies the IMS architecture. These are useful baselines for discussing future voice service, but they do not, on their own, specify how a future 6G radio or core implements voice. A 6G IMS evolution or alternative would need to be established through approved 3GPP work and specifications, not inferred from a study report.
+
+### Standardization path and voice topics
+
+3GPP describes Release 20 as the 6G study phase and Release 21 as the start of normative 6G specification work. The [3GPP Release 21 timeline](https://www.3gpp.org/news-events/3gpp-news/rel21-timeline) gives the current stage milestones; these are program targets, not a guarantee that any particular voice feature will be standardized. SA1 develops service requirements; architecture, security, media, and radio specifications are developed by the relevant 3GPP groups as work items are approved.
+
+For voice-call standardization, the questions to track include service requirements and call continuity; IMS/core and access architecture; media and codec negotiation; QoS and latency treatment; mobility and interworking; emergency and priority communications; and security, privacy, and interoperability. These are topics for standards work, not claims that a particular 6G solution or performance target has already been adopted.
+
+### How to read the proposed architecture above
+
+The architecture, signaling flow, and protocol labels in this document are design proposals, not an approved 3GPP 6G specification. In particular, names such as “NAS Intent,” “QoS Flow ID 20” as a standardized voice profile, “semantic/neural codec” SDP extensions, and a “MoE” in the UPF should not be read as 3GPP-defined 6G procedures or interfaces. Treat them as concepts requiring formal specification and interoperability work unless and until the relevant 3GPP specifications define them.
+
+### 3GPP references
+
+- [3GPP: 6G Use Cases and Service Requirements (SA1)](https://www.3gpp.org/technologies/sa1-use-cases-6g)
+- [3GPP TR 22.870 specification record](https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=4374)
+- [3GPP TS 22.173 specification record](https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=620)
+- [3GPP TS 23.228 specification record](https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=821)
+- [3GPP: Release 21 timeline](https://www.3gpp.org/news-events/3gpp-news/rel21-timeline)
+
