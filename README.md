@@ -128,7 +128,7 @@ sequenceDiagram
             C-->>R: Carry response signaling
             R-->>A: Deliver final response; no media session
         end
-    and Optional AI assistance (independent of SIP call control)
+    opt Optional AI assistance (independent of SIP call control)
         A-->>R: Optional authorized intent or assistance request
         R-->>C: Carry request over connectivity
         C-->>D: Optional exposure/API path (conceptual)
