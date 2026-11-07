@@ -448,3 +448,60 @@ Recommended independent variables include offered calls and concurrency; subscri
 | 27849–27850 | HSS/RAN enterprise case study; codec adaptation, TADS, QoE and slice-aware session policy. |
 | 27851–27852 | AI/ML and sustained-performance loop; paper's network-slicing/AI figure and testbed outline. |
 | 27852–27854 | TADS skip, overload control, claimed KPI results, conclusion and future directions. |
+
+## Supplementary Details from a Full-Paper Review
+
+*Append-only supplement (7 November 2026). The sections above are retained as written; the details below add source-specific material and clarify distinctions the paper makes.*
+
+### What the paper's figure actually shows
+
+The paper contains one substantive architecture figure (PDF p. 9; journal p. 27852); it is a conceptual schematic, not a 6G protocol or IMS call-flow diagram. It shows a 5G-network-slicing handset and three service classes (public safety, consumer, and enterprise) connected to an IMS core; policy-driven voice setup leads toward AI decision agents, while the IMS core and agents connect to sustained-performance modeling through AI training/inference. The paper's other call flows are prose and tables. The diagrams in this README are therefore explanatory reconstructions, not images or wire-level flows copied from the paper.
+
+### Additional service and policy details
+
+| Topic | Additional detail stated in the paper | Simulation interpretation |
+|---|---|---|
+| IMS messaging and alerts | Beyond RCS chat using SIP `MESSAGE` or an `INVITE`-based MSRP session, the paper names SIP `INFO`, `NOTIFY`, and `PUBLISH/SUBSCRIBE` for real-time alerts and subscriptions. It also mentions IP-SM-GW interworking to SMS. | Treat these as separate signaling/application services; don't add them to the RTP voice-media path. |
+| Media and bearer policy | For its 4G/5G background, the paper describes bearer isolation, SDP-negotiated SRTP, admission control, and P-CSCF-to-PCRF policy over Rx. It cites LTE QCI 1 / 2 and 5G 5QI 1 / 2 for voice/video, respectively. | These are legacy-generation examples in the paper, not 6G QoS definitions. Model signaling policy, media protection, admission, and radio/packet QoS as distinct mechanisms. |
+| Subscriber and business context | Proposed inputs include profile/entitlement, location history, usage patterns, time of day, calendar or business-directory/CRM context, media preferences, and network/slice state. | Make context an explicit input with freshness, availability, privacy, and authorization assumptions; the paper does not define interoperable signaling for these data. |
+| User-facing call assistance | The paper lists live transcription/summarization, sentiment cues, contextual suggestions such as adding a participant or scheduling follow-up, translation, speech-to-text/NLP, and voice biometrics. | These are optional applications around a call, with separate consent, privacy, accuracy, endpoint capability, and compute-cost assumptions. |
+| Emergency escalation proposal | It suggests detecting voice tone, background noise, or words such as “help”/“emergency,” dynamically applying `wps.0`, notifying emergency services, providing GPS location, and recording/classifying calls. | This is a research proposal in the paper, not a reliable substitute for explicit emergency dialing, validated location/routing, or authorized WPS entitlement. Model any inference only as an experimental signal with false-positive/negative behavior. |
+| Slice-aware service selection | Public-safety, enterprise, telemedicine, and personal-communications classes are discussed; slice attributes could influence security protocol, codec, media path, signaling configuration, CSCF/application-server selection, and policy binding. | Treat each as a proposed policy input and independently specify authorization, compatible options, and fallback; the paper provides no standardized slice-to-IMS interface. |
+
+### Keep the three session-selection ideas distinct
+
+The abstract names three mechanisms: **Circuit Switched (CS) Selection Optimization**, **TADS Skip Logic for Call Path Reduction**, and **Voice Termination Election Logic**. The body discusses related but non-identical choices:
+
+| Mechanism in the paper | What the paper describes | Modeling boundary |
+|---|---|---|
+| CS / fallback selection | A selective-routing method evaluates radio conditions, subscription privileges, and congestion before choosing whether to invoke circuit-switched fallback or continue with IMS. The paper cites US2016/0150497A1 and US20240205753A1 in this context. | Distinguish access-domain or CS-fallback selection from ordinary SIP destination routing. The paper does not provide a complete executable algorithm for the abstract's “CS Selection Optimization.” |
+| TADS election and skip | TADS may be skipped when a model's confidence in the primary access is above an example threshold (>95% VoLTE success), or invoked selectively when mobility/network signals make fallback evaluation useful. | Represent the threshold, prediction confidence/calibration, decision cost, and safe fallback as experiment parameters; the threshold is an example, not a general rule. |
+| Voice termination election | The abstract names this as a patented mechanism; the paper also discusses predicted QoE, SIP errors, alternate application servers, and access/route decisions. | Do not assume “termination election” is fully specified by the paper: it supplies no precise algorithm, message extension, or deterministic procedure for it. |
+
+The paper also cites US20250220438A1 for slice-based security/policy selection. These patent references and mechanism descriptions are source context, not evidence that the mechanisms are standardized, interoperable, or validated for 6G.
+
+### Case-study and testbed details for reproducing the paper's claims
+
+The HSS/RAN case study depicts an enterprise user moving from an urban macro-cell with good LTE/5G coverage toward a low-bandwidth, intermittently connected rural femtocell. The profile is enterprise-priority, video-capable, and **not WPS-authorized**. Reported actions include switching an audio/video offer to audio-only, choosing AMR-NB at 12.2 kbps, skipping TADS, requesting QCI 1 / 5QI 1 and DSCP 46 treatment, enabling mid-call QoE/handover alerts, and optionally establishing a standby SIP path. The reported `<250 ms` setup and `<20 ms` jitter are illustrative claims from this case study, not protocol requirements.
+
+The later performance case study (PDF pp. 9–11; journal pp. 27852–27854) reports a test environment with VoLTE, VoNR, and Wi-Fi calling; AI inference at TAS and PCF layers; model pipelines integrated with CI/CD; and custom TADS election/skip modules. It states traffic generation of **over 10,000 concurrent calls per hour** across urban, suburban, and low-coverage geographies, and model training on real-world datasets and testbed logs covering **30 days**. Reported observations include SIP INVITE/480/503 flows, setup time and quality degradation, codec adaptation, HSS lookup delay, WPS RPH enforcement, and location correlation with service outcome.
+
+The paper gives example control points of confidence above 95% for skipping TADS on a primary VoLTE path, CPU above 70%, and average jitter above 40 ms for overload handling. It says unconditional TADS evaluation can add over 400 ms in some cases, while selective invocation reduced mean setup time by 36%. These figures should be configurable workload/decision parameters rather than hard-coded standards.
+
+Its suggested overload actions are to bypass nonessential application processing, skip high-latency TAS work, use pre-cached emergency/WPS session templates, reroute or redistribute sessions across underused TAS nodes/access networks, and apply dedicated slices for high-priority users. The paper mentions Rx/Gx policy/profile injection for application-level enforcement. A reproducible model should include AI inference/telemetry delay, threshold crossing, resource-capacity checks, false predictions, policy authorization, and deterministic behavior when AI is unavailable.
+
+### Further topics and source limitations
+
+The conclusion's future-work list includes contextual LLM assistance for enterprise interactions, extending ML across RAN/core/service layers, trust scoring and behavioral risk profiles for voice authentication, and autonomous IMS slices for disasters or load spikes. These are prospective research directions; they are not prerequisites for baseline IMS voice simulation.
+
+The paper does not supply enough implementation detail to reproduce its reported testbed or verify the KPI claims independently: it omits such items as workload distributions, exact baseline configuration, full model features/hyperparameters, confidence intervals, and detailed measurement methodology. Its abstract also names “Voice Termination Election Logic” without defining that mechanism in the body. Accordingly, retain the KPI values as source-reported hypotheses and make the missing assumptions explicit in any simulation.
+
+| PDF pages | Main source material |
+|---|---|
+| 1–2 | Abstract; IMS/SIP/SDP baseline; CSCF, TAS, HSS, emergency routing; video, messaging, security, and QoS. |
+| 3–4 | Rx/PCRF and WPS/RPH example; AI policy and user-assistance proposals; emergency voice concepts. |
+| 5–6 | 911/WPS comparison; location and slice proposals; HSS/RAN enterprise case-study setup and decisions. |
+| 7–8 | Case-study outcomes; slice-aware security/routing; AI/ML and LLM feedback loop; patents and innovations table. |
+| 9 | The single substantive architecture figure; testbed outline and KPI collection plan. |
+| 10–11 | TADS skip, ML models, overload thresholds/actions, reported performance table, conclusion. |
+| 12–13 | Future-work topics and bibliography. |
