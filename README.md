@@ -109,32 +109,32 @@ The Control Plane simplifies session setup by introducing an explicit **AI-Inten
 
 ---
 
-## 3. End-to-End Signaling Sequence (Vo6G SA Session Establishment)
+## 3. End-to-End Signaling Sequence (Vo6G SA Session Establishment) - Draft
 
 The following sequence details an end-to-end call establishment between UE-A (initiating agent/human) and UE-B within a Standalone 6G topology.
 
 ```
- UE-A (6G)          6G gNB            6G AMF/SMF          IMS/P-CSCF          UE-B (6G)
-   |                  |                    |                   |                  |
+ UE-A (6G)           6G gNB            6G AMF/SMF          IMS/P-CSCF          UE-B (6G)
+   |                   |                    |                   |                  |
    |-- 1. NAS Intent ->|                    |                   |                  |
-   |   (Voice Request)|-- 2. Service Req ->|                   |                  |
-   |                  |   & Slice Assign   |                   |                  |
-   |                  |<-- 3. PDU Session -|                   |                  |
-   |                  |   Modification     |                   |                  |
+   |   (Voice Request) |-- 2. Service Req ->|                   |                  |
+   |                   |   & Slice Assign   |                   |                  |
+   |                   |<-- 3. PDU Session -|                   |                  |
+   |                   |       Modification |                   |                  |
    |<-- 4. RRC Reconf -|                    |                   |                  |
-   |   (QoS-20 Flow)  |                    |                   |                  |
-   |                                       |                   |                  |
-   |============ 5. SIP INVITE (SDP: Semantic, Neural Codec) =>|                  |
-   |                                       |                   |-- 6. SIP INVITE->|
-   |                                       |                   |   (P-CSCF Alloc) |
-   |                                       |                   |<-- 7. 180 Ring --|
-   |<=========== 8. SIP 180 Ringing ===========================|                  |
-   |                                       |                   |<-- 9. 200 OK ----|
-   |<=========== 10. SIP 200 OK (SDP Negotiated Matrix) =======|                  |
-   |                                       |                   |                  |
-   |============ 11. SIP ACK =================================>|-- 12. SIP ACK -->|
-   |                                       |                   |                  |
-   |<======================== 13. NATIVE VOICE SESSION ==========================>|
+   |   (QoS-20 Flow)   |                    |                   |                  |
+   |                   |                    |                   |                  |
+   |============ 5. SIP INVITE (SDP: Semantic, Neural Codec)  =>|                  |
+   |                                        |                   |-- 6. SIP INVITE->|
+   |                                        |                   |   (P-CSCF Alloc) |
+   |                                        |                   |<-- 7. 180 Ring --|
+   |<=========== 8. SIP 180 Ringing ============================|                  |
+   |                                        |                   |<-- 9. 200 OK ----|
+   |<=========== 10. SIP 200 OK (SDP Negotiated Matrix) ========|                  |
+   |                                        |                   |                  |
+   |============ 11. SIP ACK ==================================>|-- 12. SIP ACK -->|
+   |                                        |                   |                  |
+   |<======================== 13. NATIVE VOICE SESSION ===========================>|
    |             (Bi-directional Semantic Token / Real-Time Data Channel)          |
 ```
 
