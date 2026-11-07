@@ -91,7 +91,7 @@ This is a **conceptual design**, not a 3GPP architecture. It explores how a futu
 
 The following diagram, from the [Ericsson article on IMS evolution in 6G](https://www.ericsson.com/en/blog/2026/6/ims-6g-evolution), shows IMS alongside 6G and legacy access options. It presents IMS as a communications platform with separate control and media functions, plus control/media exposure and AI/application enablement.
 
-![Ericsson's illustrative 6G UE, core network, and IMS architecture](6G%20UE_with_IMS.jpeg)
+![Ericsson's illustrative 6G UE, core network, and IMS architecture](assets/images/6g-ue-with-ims.jpeg)
 
 Ericsson's perspective is that IMS can provide continuity for telephony, emergency services, identity, regulatory needs, and interoperability while expanding beyond voice. Data channels, exposure APIs, and AI-enabled capabilities such as live translation and fraud prevention could support richer, real-time services. The diagram's AI and application enablement layer is an architectural vision, not a standardized 6G network function or a claim that those capabilities are already deployed as part of 3GPP 6G.
 
