@@ -1,6 +1,16 @@
 # Voice Call in 6G
 
-This repository collects research and a conceptual design for voice services over future 6G networks. The architecture and signaling flows are proposals, not a 3GPP specification; see the standardization notes in the [architecture document](docs/architecture/voice-call-in-6g.md).
+This repository collects research and a conceptual design for voice services over future 6G networks. 
+The architecture and signaling flows are proposals, not a 3GPP specification; 
+see the standardization notes in the [architecture document](docs/architecture/voice-call-in-6g.md).
+
+## Initial Thoughts
+There might be below 2 cases: 
+
+* a. A 6G UE will do a call to 5G UE or vice-versa, else will do a voice call to 4G/LTE UE as well.
+* b. A 6G UE will do a voice call to 6G UE, which is natural.
+
+**NOTE**: Need to check VoNR and VoLTE user services and call flow, architecture. 
 
 ## Documentation
 
