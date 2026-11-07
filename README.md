@@ -224,6 +224,12 @@ For a voice-service design, the key RAN-to-core questions are:
 - **AI-assisted control:** RAN automation/xApps may help optimize resources against an SLA, but control-loop delay, data quality, policy constraints, stability, explainability, and safe fallback matter. AI should augment—not replace—deterministic service policy and radio safety controls.
 - **NTN:** Satellite access extends reach but has distinct propagation delay, Doppler, and intermittent-link constraints. Codec efficiency and adaptation help with limited capacity; they cannot eliminate propagation delay. Interactive voice must be evaluated separately from delay-tolerant messaging.
 
+### Capacity trade-off during call establishment
+
+Call establishment uses signaling resources, while an admitted call also creates ongoing media demand. Admission policy therefore has to account for whether the network can support the requested media treatment, not just whether it can process the setup signaling. Reserving or conservatively admitting resources can protect the quality of active calls, but may increase rejection or delay of new calls; admitting more calls can raise utilization while increasing contention, delay, jitter, and loss for active media. Reserving resources before the called party answers can also hold capacity during ringing or unanswered attempts, whereas waiting to allocate resources risks having insufficient capacity when the call is accepted.
+
+Codec or media-feature adaptation may reduce resource demand, but can reduce fidelity or feature quality and requires compatible endpoints. These are general capacity-management trade-offs, not defined 6G procedures: 6G voice admission, reservation timing, and QoS behavior have not been standardized. Model them as explicit scenario assumptions and measure setup success/time alongside active-call media quality and resource utilization.
+
 ### Current research-informed design view (7 November 2026)
 
 The most defensible near-term design is **evolutionary and service-led**: preserve interoperable IMS telephony and media negotiation as the baseline, and let a future 6G access/core improve coverage, continuity, policy coordination, and automation without assuming a new “native 6G voice” protocol. Research is valuable for selecting candidate enhancements, but it does not establish a 3GPP architecture or deployment requirement.
