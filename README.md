@@ -616,3 +616,125 @@ The paper does not supply enough implementation detail to reproduce its reported
 | 9 | The single substantive architecture figure; testbed outline and KPI collection plan. |
 | 10–11 | TADS skip, ML models, overload thresholds/actions, reported performance table, conclusion. |
 | 12–13 | Future-work topics and bibliography. |
+
+## Ericsson's 6G AI Domain Proposal and IMS Interaction
+
+This section summarizes Ericsson's [*AI-native services and the 6G AI domain*](https://www.ericsson.com/en/blog/2026/9/ai-domain-6g-core-network) article in original wording. It captures the article's architectural direction, not a standardized 3GPP 6G design. In particular, the IMS interactions and call flow below are proposed ways to apply the AI-domain concept to this repository's voice architecture; the article does not define 6G IMS interfaces or call procedures.
+
+### Proposal overview
+
+The central shift is from using AI mainly to optimize network operations toward making the network an AI-native platform: connectivity, compute, and AI capabilities work together to support services whose behavior depends on an application or device's needs. AI is treated as an architectural capability rather than a single model or a replacement for the communication core.
+
+The AI domain is described as a distinct, logically organized part of the 6G architecture that can evolve alongside established communication capabilities. This separation is intended to let AI-related services and functions evolve without destabilizing core communication services. It is not a claim that the AI domain is a new standardized 3GPP network function or a separate physical network.
+
+Key ideas in the proposal include:
+
+- **Intent-driven services:** Applications or devices express a desired outcome or experience. Network capabilities can then be coordinated to meet that intent, subject to operator policy, subscription, and available resources.
+- **Collaborative AI agents:** Multiple agents can perform specialized tasks and coordinate across services and network domains. The concept spans centralized and distributed intelligence; it does not prescribe a specific agent protocol or require autonomous agents to control the network.
+- **Distributed intelligence and compute:** AI capabilities can be placed where useful across devices, edge, and core environments. Connectivity and compute are considered together when delivering AI-enabled services.
+- **Programmability and exposure:** Network capabilities can be exposed through APIs to support application and service integration. Exposure needs access control, authorization, privacy protections, and operator governance.
+- **AI-aware service differentiation:** Future networks may need to distinguish and support different AI-related service requirements rather than treating every workload as undifferentiated data traffic. The proposal does not define a standardized AI traffic class, QoS identifier, or guarantee.
+- **Trust, security, and resilience:** Intent handling, agent collaboration, exposed capabilities, and AI workloads require explicit trust boundaries and safeguards. Keeping AI capabilities logically separated from communication-service functions supports controlled evolution, but does not by itself provide security or availability.
+- **Service and business evolution:** Combining connectivity, compute, and AI capabilities can enable new service models beyond connectivity alone. These are opportunities, not defined charging or monetization mechanisms.
+
+The proposal is evolutionary in the sense that AI capabilities complement communication services and network functions. It does not specify the final 6G core decomposition, standardized interfaces, model placement, or deployment timeline for any individual AI capability.
+
+### Conceptual architecture, including IMS
+
+The diagram distinguishes the proposed AI domain from IMS service control and the connectivity functions that carry signaling and media. Dotted arrows are conceptual interactions only; they do not represent standardized interfaces.
+
+```mermaid
+flowchart TB
+    UE[UE and application agents]
+    APP[Third-party applications and services]
+
+    subgraph SERVICES["Communication and application services"]
+        IMS["IMS service domain<br/>SIP session control, telephony services,<br/>media negotiation and interworking"]
+        APPS["AI-enabled applications<br/>translation, assistance, collaboration"]
+    end
+
+    subgraph CORE["6G connectivity and compute platform (conceptual)"]
+        AI["AI domain<br/>intent interpretation, agent coordination,<br/>analytics and AI capability orchestration"]
+        POLICY["Operator policy and authorization"]
+        CN["6G communication core<br/>access, mobility, session and user-plane functions"]
+        MEDIA["User-plane media path"]
+        EDGE["Edge / core compute resources"]
+    end
+
+    RAN["6G access network"]
+    PEER["Peer IMS / communication network"]
+
+    UE -->|SIP signaling| IMS
+    IMS <-->|service requirements / policy interaction| POLICY
+    UE -.->|optional service intent| AI
+    APP -.->|authorized API request or intent| AI
+    IMS -.->|optional request for network assistance| AI
+    AI -->|recommendation, subject to policy| POLICY
+    POLICY -->|authorized connectivity and QoS policy| CN
+    UE <-->|radio access| RAN
+    RAN <-->|user-plane connectivity| CN
+    CN <-->|media transport| MEDIA
+    MEDIA <-->|RTP / SRTP| PEER
+    AI <-->|distributed AI capabilities| EDGE
+    IMS <-->|SIP interworking| PEER
+    APPS <-->|application-level AI service| AI
+```
+
+In this model, IMS continues to own telephony session semantics: registration, SIP routing, service logic, media negotiation, and interworking. The AI domain may help interpret an application's requested experience, coordinate an optional AI service, or provide recommendations about connectivity or compute. Operator policy and the communication core remain responsible for deciding whether a request is authorized and can be provisioned; the RAN delivers the resulting packet treatment subject to radio conditions.
+
+An application-level capability such as live translation is distinct from network-control AI. Translation may process media or associated data only when the service and endpoints support it and the required consent, privacy, and security conditions are met. It is not a mandatory IMS call function, voice codec, or substitute for SIP/SDP negotiation.
+
+### Illustrative IMS call with optional AI-domain assistance
+
+This flow extends the repository's [baseline IMS call flow](#baseline-ims-voice-call-flow) with optional intent and network-assistance interactions. It is an architecture sketch, not a normative message sequence. The labels “intent,” “AI recommendation,” and “policy interaction” are descriptive; they are not proposed SIP extensions or standardized 6G messages.
+
+```mermaid
+sequenceDiagram
+    participant A as UE-A / IMS client
+    participant R as 6G RAN
+    participant C as 6G communication core
+    participant P as IMS P-CSCF / S-CSCF
+    participant T as IMS TAS / service logic
+    participant D as AI domain
+    participant O as Operator policy
+    participant B as IMS / UE-B
+
+    A->>R: Obtain access and IP connectivity
+    R->>C: Access and mobility signaling
+    A->>P: IMS registration and SIP INVITE with SDP
+    P->>T: Apply IMS service and routing logic
+    opt Optional experience intent or AI service request
+        A-->>D: Express application-level service intent
+        T-->>D: Request optional network or compute assistance
+        D-->>O: Recommend a candidate treatment
+        O->>C: Authorize or reject policy request
+        C->>R: Provision authorized packet treatment if available
+    end
+    T->>B: Route SIP INVITE and apply terminating service logic
+    B-->>T: SIP response and SDP answer
+    T-->>A: SIP response with negotiated session parameters
+    A->>B: SIP ACK
+    A<<->>B: RTP/SRTP media over the user plane
+    opt Optional AI-enabled application during the session
+        A-->>D: Authorized request for an application capability
+        D-->>A: Optional result, subject to endpoint and service support
+    end
+    Note over P,T: IMS remains responsible for call control and media negotiation.
+    Note over D,O,C: AI recommendations are optional; operator policy and core functions govern provisioning.
+    Note over R,C: Packet treatment and radio delivery are subject to authorization, capacity, and radio conditions.
+```
+
+### Design boundaries and open questions
+
+| Area | Appropriate interpretation for this voice architecture | Not established by the proposal |
+|---|---|---|
+| IMS | Existing IMS service-control concepts can remain the baseline for voice and multimedia while future integration is studied. | A required replacement for IMS, a defined AI-to-IMS interface, or an AI-controlled SIP call procedure. |
+| Intent | A high-level expression of a desired service or connectivity outcome that can be translated into authorized actions. | A standardized intent syntax, SIP header, NAS message, negotiation sequence, or guarantee that every intent can be met. |
+| AI agents | A way to organize and coordinate specialized AI capabilities across service and network environments. | A specified agent protocol, trust model, delegation model, or permission to bypass operator policy. |
+| QoS and resources | AI may inform recommendations; authorized policy and network functions determine whether treatment can be applied. | New standardized 6G QoS identifiers, guaranteed latency, reservation rules, or radio-scheduler behavior. |
+| AI-enabled media | An optional service or application can provide capabilities such as assistance or translation where supported. | A mandatory neural/semantic voice codec, AI processing inside the UPF, or replacement of RTP/SRTP and negotiated media. |
+| Security and privacy | Apply identity, authorization, isolation, data minimization, and operator governance to intents, agents, APIs, and telemetry. | A complete security architecture or proof that logical domain separation alone makes AI workloads safe. |
+
+For simulation, model the AI domain as an optional decision or service capability with explicit telemetry and inference delay, confidence, resource cost, authorization checks, and failure behavior. Compare against an IMS-only baseline using identical traffic and radio conditions. When AI is unavailable, its recommendation is rejected, or the requested resources cannot be provided, the call should follow the configured IMS and operator-policy behavior rather than silently relying on an AI-only path.
+
+**Source:** Ericsson, [*AI-native services and the 6G AI domain*](https://www.ericsson.com/en/blog/2026/9/ai-domain-6g-core-network). The article presents an architectural vision; the diagrams and IMS integration details in this section are this document's conceptual synthesis.
