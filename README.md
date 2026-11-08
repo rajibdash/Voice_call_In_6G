@@ -68,6 +68,21 @@ It bridges the deterministic, session-controlled environment of the IP Multimedi
 _*Will explain in detail further!*_
 
 
+## AI-enabled communication services
+
+The practical implications of AI-enabled communication services are significant. 
+Some of the most compelling use cases are also the most immediately useful listed below:
+
+* **Real-time language translation** – Speech-to-speech or speech-to-text translation enabling cross-language communication during live calls.
+* **Transcription and summarization** – Live captions during a call, along with post-call transcripts or summaries for record-keeping.
+* **AI-assisted call screening** – Filtering unwanted calls while allowing important conversations through, based on subscriber-configured preferences.
+* **Fraud detection** – Real-time analysis of calls to identify suspected fraud, with timely warnings delivered directly to the subscriber.
+* **Sign language translation** – Avatar-based, speech-to-sign-language translation supporting hearing-impaired users, including as an extension to emergency services where accessible communication is critical.
+  
+These services are distinct from generic AI assistant experiences available on consumer platforms. 
+They are embedded within the communication session itself, under operator control, with the quality 
+guarantees and regulatory safeguards that CSP-provided telephony requires.
+
 ## Documentation
 
 - [6G voice-call architecture and research notes](docs/architecture/voice-call-in-6g.md)
